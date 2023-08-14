@@ -1,0 +1,20 @@
+{
+  "name": "project-1012",
+  "version": "1.0.0",
+  "description": "An application to browse sftp",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "Neem",
+    "FIA",
+    "1012",
+    "SFTP"
+  ],
+  "author": "sahariar.alam",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^25.5.0"
+  }
+}
