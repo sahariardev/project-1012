@@ -28,8 +28,10 @@
   },
   "build": {
     "appId": "com.rifat.tm.1012",
-    "win": {
-      "target": "portable",
+    "linux": {
+      "target":[
+        "deb","snap","rpm"
+      ],
       "icon": "build/1012.png"
     }
   }

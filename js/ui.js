@@ -74,6 +74,9 @@ $('#connection-save-btn').on('click', () => {
 });
 
 const getAllConnection = () => {
+    if (!localStorage.getItem('connections')) {
+        return {};
+    }
     return JSON.parse(localStorage.getItem('connections'));
 }
 

@@ -75,7 +75,8 @@ function createWindow() {
         }
 
         const filePath = selectedFile.filePaths[0];
-        const filePathParts = filePath.split('/');
+        const splitRegex = filePath.includes('/') ? '/' : '\\';
+        const filePathParts = filePath.split(splitRegex);
 
         let data = fs.createReadStream(filePath);
         let remote = path + '/' + filePathParts[filePathParts.length - 1];
