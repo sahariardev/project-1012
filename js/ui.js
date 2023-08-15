@@ -67,10 +67,31 @@ const loadAllConnection = () => {
     const connections = getAllConnection();
     for (const [key, value] of Object.entries(connections)) {
         const $tr = $('<tr>');
+        const $deleteBtn = $('<button class="btn btn-default connection-action-btn delete">\n' +
+            '                    <span class="icon icon-cancel-circled"></span>\n' +
+            '                </button>');
+
+        const $updateBtn = $('<button class="btn btn-default connection-action-btn update">\n' +
+            '                    <span class="icon icon-pencil"></span>\n' +
+            '                </button>');
+
+        const $connectBtn = $('<button class="btn btn-default connection-action-btn connect">\n' +
+            '                    <span class="icon icon-check"></span>\n' +
+            '                </button>');
+
         $tr.append($('<td>').html(value.connectionName));
         $tr.append($('<td>').html(value.host));
-        $tr.append($('<td>').html('Actions'));
+        $tr.append($('<td>').append($deleteBtn).append($updateBtn).append($connectBtn));
 
         $('#connection-list-body').append($tr);
     }
+
+    $('.delete').on('click', (x) => {
+        const connectionName = $(x.currentTarget).parent().parent().find('td').eq(0).html();
+        let connections = getAllConnection();
+        delete connections[connectionName];
+
+        localStorage.setItem('connections', JSON.stringify(connections));
+        loadAllConnection();
+    });
 }

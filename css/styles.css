@@ -5,4 +5,9 @@
     background-color: #c5c5c5;
 }
 
+.connection-action-btn {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
 /* Add styles here to customize the appearance of your app */
