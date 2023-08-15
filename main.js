@@ -1,6 +1,8 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron')
-const path = require('path')
+const {app, BrowserWindow, ipcMain} = require('electron');
+const path = require('path');
+const http = require('http');
+const Client = require('ssh2-sftp-client');
 const ipc = ipcMain;
 
 function createWindow() {
@@ -26,6 +28,53 @@ function createWindow() {
     ipc.on('closeApp', () => {
         mainWindow.close();
     });
+
+    ipc.on('listFiles', async (event, args) => {
+        const {connection, path} = JSON.parse(args);
+        let sftp = new Client();
+
+        let obj = {
+            host: connection.host,
+            username: connection.username,
+            password: connection.password,
+            port: connection.port
+        }
+
+        let hostWithPath = obj.host + ':' + obj.port;
+        obj.sock = await getSocketProxy(hostWithPath, connection.proxyHost, connection.proxyPort);
+
+        sftp.connect(obj)
+            .then(() => {
+                return sftp.list(path);
+            })
+            .then(data => {
+                mainWindow.webContents.send('filesListed', {fileList: data, connection: connection, path: path});
+            })
+            .then(() => {
+                sftp.end();
+            })
+            .catch(err => {
+                console.error(err.message);
+            });
+    });
+}
+
+const getSocketProxy = (path, proxyHost, proxyPort) => {
+    let res = new Promise((resolve, reject) => {
+        let options = {
+            port: proxyPort,
+            host: proxyHost,
+            method: 'CONNECT',
+            path
+        };
+
+        const req = http.request(options);
+        req.end();
+        req.on('connect', (res, socket, head) => {
+            resolve(socket);
+        });
+    });
+    return res;
 }
 
 app.whenReady().then(() => {

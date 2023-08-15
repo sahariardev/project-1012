@@ -4,6 +4,7 @@ window.$ = window.jQuery = require('jquery');
 
 $(() => {
     loadAllConnection();
+    $('.file-pane').hide();
 });
 
 const closeBtn = document.getElementById('closeBtn');
@@ -94,4 +95,50 @@ const loadAllConnection = () => {
         localStorage.setItem('connections', JSON.stringify(connections));
         loadAllConnection();
     });
+
+    $('.connect').on('click', (x) => {
+        const connectionName = $(x.currentTarget).parent().parent().find('td').eq(0).html();
+        let connections = getAllConnection();
+        const connection =  connections[connectionName];
+        $('.connection-pane').hide();
+        $('.file-pane').show();
+
+        const data = {
+            connection : connection,
+            path: '/'
+        }
+
+        ipc.send('listFiles', JSON.stringify(data));
+    });
+}
+
+ipc.on('filesListed', function (event, data) {
+    generateFilesListView(data);
+});
+
+const generateFilesListView = ({fileList, connection, path}) => {
+    $('#file-list-body').html('');
+
+    fileList.forEach((file) => {
+        const $tr = $('<tr>', {class: file.type === 'd' ? 'directory': ''});
+
+        $tr.append($('<th>').html(file.name));
+        $tr.append($('<th>').html(file.type));
+        $tr.append($('<th>').html(file.size));
+        $tr.append($('<th>').html(file.longname));
+
+        $('#file-list-body').append($tr);
+    });
+
+    $('.directory').on('click', (event) => {
+        const directory = $(event.currentTarget).find('th').eq(0).html();
+
+        const data = {
+            connection : connection,
+            path: path + '/' + directory
+        }
+
+        ipc.send('listFiles', JSON.stringify(data));
+    });
+
 }

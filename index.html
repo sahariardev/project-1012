@@ -42,7 +42,7 @@
     <!-- Your app's content goes inside .window-content -->
     <div class="window-content">
         <div class="pane-group">
-            <div class="pane">
+            <div class="pane connection-pane">
                 <div class="pane-title">Connection List</div>
                 <table class="table-striped">
                     <thead>
@@ -53,6 +53,22 @@
                     </tr>
                     </thead>
                     <tbody id="connection-list-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pane file-pane">
+                <div class="pane-title">File List</div>
+                <table class="table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Size</th>
+                        <th>Long Name</th>
+                    </tr>
+                    </thead>
+                    <tbody id="file-list-body">
                     </tbody>
                 </table>
             </div>

@@ -18,6 +18,7 @@
     "electron": "^25.5.0"
   },
   "dependencies": {
-    "jquery": "^3.7.0"
+    "jquery": "^3.7.0",
+    "ssh2-sftp-client": "^9.1.0"
   }
 }
