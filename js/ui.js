@@ -1,10 +1,12 @@
 const {ipcRenderer} = require('electron');
 const ipc = ipcRenderer;
 window.$ = window.jQuery = require('jquery');
+const shell = require('electron').shell;
 
 $(() => {
     loadAllConnection();
     $('.file-pane').hide();
+    localStorage.removeItem('currentConnectionInfo');
 });
 
 const closeBtn = document.getElementById('closeBtn');
@@ -12,9 +14,17 @@ closeBtn.addEventListener('click', () => {
     ipc.send('closeApp');
 });
 
+$('.link').on('click', (event) => {
+    shell.openExternal($(event.currentTarget).attr('link'));
+});
+
 $('#add-new-connection').on('click', () => {
     cleanConnectionModal();
     $('#connectionModal').modal('show');
+});
+
+$('#author-info').on('click', () => {
+    $('#author-info-modal').modal('show');
 });
 
 $('#home').on('click', () => {
@@ -22,9 +32,13 @@ $('#home').on('click', () => {
     $('#file-list-body').html('');
     loadAllConnection();
     $('.file-pane').hide();
+    localStorage.removeItem('currentConnectionInfo');
 });
 
 $('#upload').on('click', () => {
+    if (!localStorage.getItem("currentConnectionInfo")) {
+        return;
+    }
     ipc.send('uploadFile', localStorage.getItem("currentConnectionInfo"));
 });
 
