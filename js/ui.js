@@ -17,6 +17,17 @@ $('#add-new-connection').on('click', () => {
     $('#connectionModal').modal('show');
 });
 
+$('#home').on('click', () => {
+    $('.connection-pane').show();
+    $('#file-list-body').html('');
+    loadAllConnection();
+    $('.file-pane').hide();
+});
+
+$('#upload').on('click', () => {
+    ipc.send('uploadFile', localStorage.getItem("currentConnectionInfo"));
+});
+
 $('#connection-save-btn').on('click', () => {
     $('#connection-name-error').html('');
     const connectionName = $('#connection-name').val();
@@ -113,6 +124,7 @@ const loadAllConnection = () => {
 }
 
 ipc.on('filesListed', function (event, data) {
+    localStorage.setItem("currentConnectionInfo", JSON.stringify(data));
     generateFilesListView(data);
     updateSelectedPath(data.path, data.connection);
 });

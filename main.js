@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {app, BrowserWindow, ipcMain, dialog} = require('electron');
 const path = require('path');
 const http = require('http');
 const Client = require('ssh2-sftp-client');
@@ -60,7 +60,56 @@ function createWindow() {
             });
     });
 
+    ipc.on('uploadFile', async (event, args) => {
+        const {connection, path} = JSON.parse(args);
+
+        var selectedFile = await dialog.showOpenDialog({
+            properties: ['openFile']
+        });
+
+        if (!selectedFile || selectedFile.canceled) {
+            return;
+        }
+        if (!selectedFile.filePaths) {
+            return;
+        }
+
+        const filePath = selectedFile.filePaths[0];
+        const filePathParts = filePath.split('/');
+
+        let data = fs.createReadStream(filePath);
+        let remote = path + '/' + filePathParts[filePathParts.length - 1];
+
+        let sftp = new Client();
+
+        let obj = {
+            host: connection.host,
+            username: connection.username,
+            password: connection.password,
+            port: connection.port
+        }
+
+        let hostWithPath = obj.host + ':' + obj.port;
+        obj.sock = await getSocketProxy(hostWithPath, connection.proxyHost, connection.proxyPort);
+
+        sftp.connect(obj)
+            .then(() => {
+                return sftp.put(data, remote);
+            })
+            .then(() => {
+                listFiles(event, args);
+                sftp.end();
+            })
+            .catch(err => {
+                console.error(err.message);
+            });
+    });
+
     ipc.on('listFiles', async (event, args) => {
+        listFiles(event, args);
+    });
+
+    const listFiles = async (event, args) => {
         const {connection, path} = JSON.parse(args);
         let sftp = new Client();
 
@@ -87,7 +136,7 @@ function createWindow() {
             .catch(err => {
                 console.error(err.message);
             });
-    });
+    }
 }
 
 const getSocketProxy = (path, proxyHost, proxyPort) => {
