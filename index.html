@@ -5,6 +5,8 @@
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="./css/photon.min.css">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
 <div class="window">
@@ -26,15 +28,10 @@
                 <button class="btn btn-default">
                     <span class="icon icon-popup"></span>
                 </button>
-                <button class="btn btn-default">
-                    <span class="icon icon-shuffle"></span>
+                <button class="btn btn-default" id="add-new-connection">
+                    <span class="icon icon-plus"></span>
                 </button>
             </div>
-
-            <button class="btn btn-default">
-                <span class="icon icon-home icon-text"></span>
-                Filters
-            </button>
 
             <button class="btn btn-default pull-right" id="closeBtn">
                 <span class="icon icon-cancel"></span>
@@ -46,124 +43,16 @@
     <div class="window-content">
         <div class="pane-group">
             <div class="pane">
+                <div class="pane-title">Connection List</div>
                 <table class="table-striped">
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Kind</th>
-                        <th>Date Modified</th>
-                        <th>Author</th>
+                        <th>Host</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td>bars.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>base.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>button-groups.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>buttons.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>docs.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>forms.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>grid.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>icons.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>images.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>lists.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>mixins.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>navs.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>normalize.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>photon.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>tables.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>tabs.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>utilities.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
-                    <tr>
-                        <td>variables.scss</td>
-                        <td>Document</td>
-                        <td>Oct 13, 2015</td>
-                        <td>connors</td>
-                    </tr>
+                    <tbody id="connection-list-body">
                     </tbody>
                 </table>
             </div>
@@ -171,7 +60,58 @@
     </div>
 </div>
 
+<!--connection modal-->
+<!-- Button trigger modal -->
+<div class="modal fade" id="connectionModal" tabindex="-1" aria-labelledby="connectionModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Connection</h5>
+                <button type="button" class="btn-close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label>Connection Name</label>
+                        <input type="text" class="form-control" placeholder="connection name" id="connection-name">
+                        <div class="connection-name-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Host</label>
+                        <input type="text" class="form-control" placeholder="host" id="host">
+                    </div>
+                    <div class="form-group">
+                        <label>Port</label>
+                        <input type="text" class="form-control" placeholder="port" id="port">
+                    </div>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" class="form-control" placeholder="username" id="username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="text" class="form-control" placeholder="password" id="password">
+                    </div>
+                    <div class="form-group">
+                        <label>Proxy Host</label>
+                        <input type="text" class="form-control" placeholder="proxy host" id="proxy-host">
+                    </div>
+                    <div class="form-group">
+                        <label>Proxy Port</label>
+                        <input type="text" class="form-control" placeholder="proxy port" id="proxy-port">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="connection-save-btn">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Javascript -->
+<script src="js/bootstrap.bundle.min.js" ></script>
 <script src="js/ui.js" ></script>
 </body>
 </html>

@@ -1,6 +1,8 @@
 /* styles.css */
 
-body {
-    background-color: #525252
+.pane-title {
+    text-align: center;
+    background-color: #c5c5c5;
 }
+
 /* Add styles here to customize the appearance of your app */
