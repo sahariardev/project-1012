@@ -4,6 +4,7 @@ const path = require('path');
 const http = require('http');
 const Client = require('ssh2-sftp-client');
 const ipc = ipcMain;
+const fs = require('fs');
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -21,12 +22,42 @@ function createWindow() {
             devTools: true,
             preload: path.join(__dirname, 'preload.js')
         }
-    })
+    });
 
     mainWindow.loadFile('index.html');
 
     ipc.on('closeApp', () => {
         mainWindow.close();
+    });
+
+    ipc.on('downloadFile', async (event, args) => {
+        const {connection, filePath} = JSON.parse(args);
+        let sftp = new Client();
+
+        let obj = {
+            host: connection.host,
+            username: connection.username,
+            password: connection.password,
+            port: connection.port
+        }
+
+        let hostWithPath = obj.host + ':' + obj.port;
+        obj.sock = await getSocketProxy(hostWithPath, connection.proxyHost, connection.proxyPort);
+
+        sftp.connect(obj)
+            .then(() => {
+                const pathParts = filePath.split('/');
+                const downloadedFileNameWithPath = path.join(__dirname, pathParts[pathParts.length - 1]);
+                let dst = fs.createWriteStream(downloadedFileNameWithPath);
+
+                return sftp.get(filePath, dst);
+            })
+            .then(() => {
+                sftp.end();
+            })
+            .catch(err => {
+                console.error(err.message);
+            });
     });
 
     ipc.on('listFiles', async (event, args) => {

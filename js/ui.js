@@ -121,7 +121,7 @@ const generateFilesListView = ({fileList, connection, path}) => {
     $('#file-list-body').html('');
 
     fileList.forEach((file) => {
-        const $tr = $('<tr>', {class: file.type === 'd' ? 'directory' : ''});
+        const $tr = $('<tr>', {class: file.type === 'd' ? 'directory' : 'file'});
 
         $tr.append($('<th>').html(file.name));
         $tr.append($('<th>').html(file.type));
@@ -140,6 +140,17 @@ const generateFilesListView = ({fileList, connection, path}) => {
         }
 
         ipc.send('listFiles', JSON.stringify(data));
+    });
+
+    $('.file').on('click', (event) => {
+        const directory = $(event.currentTarget).find('th').eq(0).html();
+
+        const data = {
+            connection: connection,
+            filePath: path + '/' + directory
+        }
+
+        ipc.send('downloadFile', JSON.stringify(data));
     });
 }
 
