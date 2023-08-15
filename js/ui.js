@@ -99,12 +99,12 @@ const loadAllConnection = () => {
     $('.connect').on('click', (x) => {
         const connectionName = $(x.currentTarget).parent().parent().find('td').eq(0).html();
         let connections = getAllConnection();
-        const connection =  connections[connectionName];
+        const connection = connections[connectionName];
         $('.connection-pane').hide();
         $('.file-pane').show();
 
         const data = {
-            connection : connection,
+            connection: connection,
             path: '/'
         }
 
@@ -114,13 +114,14 @@ const loadAllConnection = () => {
 
 ipc.on('filesListed', function (event, data) {
     generateFilesListView(data);
+    updateSelectedPath(data.path, data.connection);
 });
 
 const generateFilesListView = ({fileList, connection, path}) => {
     $('#file-list-body').html('');
 
     fileList.forEach((file) => {
-        const $tr = $('<tr>', {class: file.type === 'd' ? 'directory': ''});
+        const $tr = $('<tr>', {class: file.type === 'd' ? 'directory' : ''});
 
         $tr.append($('<th>').html(file.name));
         $tr.append($('<th>').html(file.type));
@@ -134,11 +135,35 @@ const generateFilesListView = ({fileList, connection, path}) => {
         const directory = $(event.currentTarget).find('th').eq(0).html();
 
         const data = {
-            connection : connection,
+            connection: connection,
             path: path + '/' + directory
         }
 
         ipc.send('listFiles', JSON.stringify(data));
     });
+}
 
+const updateSelectedPath = (path, connection) => {
+    $selectedPath = $('#selected-path');
+    $selectedPath.html('');
+    const pathParts = path.split('/');
+
+    let concatedPath = '';
+
+    pathParts.forEach(pathPart => {
+        concatedPath += pathPart + '/'
+        $span = $('<span>', {path: concatedPath, class: 'path-part'});
+        $selectedPath.append($span.html(pathPart));
+        $selectedPath.append($('<span>').html('/'));
+    });
+
+    $('.path-part').on('click', () => {
+        const path = $(event.currentTarget).attr('path');
+        const data = {
+            connection: connection,
+            path: path
+        }
+
+        ipc.send('listFiles', JSON.stringify(data));
+    });
 }
